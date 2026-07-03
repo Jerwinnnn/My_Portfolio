@@ -6,7 +6,7 @@ const PROJECTS = [
     tech: ['Python', 'AWS', 'OutSystems'],
     github: null,
     live: null,
-    status: 'Current',
+    status: 'live',
   },
   {
     title: 'W Express',

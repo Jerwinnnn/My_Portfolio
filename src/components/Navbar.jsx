@@ -11,11 +11,26 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const sections = document.querySelectorAll('section[id]')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id)
+        })
+      },
+      { rootMargin: '-40% 0px -55% 0px' }
+    )
+    sections.forEach((s) => observer.observe(s))
+    return () => observer.disconnect()
   }, [])
 
   return (
@@ -31,16 +46,24 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <ul className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map(({ label, href }) => (
-            <li key={href}>
-              <a
-                href={href}
-                className="text-sm text-slate-400 hover:text-white transition-colors duration-150"
-              >
-                {label}
-              </a>
-            </li>
-          ))}
+          {NAV_LINKS.map(({ label, href }) => {
+            const isActive = activeSection === href.slice(1)
+            return (
+              <li key={href}>
+                <a
+                  href={href}
+                  className={`text-sm transition-colors duration-150 relative ${
+                    isActive ? 'text-white font-medium' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {label}
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-0 right-0 h-px bg-accent rounded-full" />
+                  )}
+                </a>
+              </li>
+            )
+          })}
         </ul>
 
         <a
@@ -76,7 +99,9 @@ export default function Navbar() {
               <li key={href}>
                 <a
                   href={href}
-                  className="block text-slate-300 hover:text-white transition-colors"
+                  className={`block transition-colors ${
+                    activeSection === href.slice(1) ? 'text-white font-medium' : 'text-slate-300 hover:text-white'
+                  }`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {label}
@@ -85,7 +110,7 @@ export default function Navbar() {
             ))}
             <li>
               <a
-                href="/resume.pdf"
+                href="/Jerwin_Tugas_CV.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-outline text-sm py-1.5 px-4 w-fit"
